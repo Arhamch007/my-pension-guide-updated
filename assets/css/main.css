@@ -1,0 +1,329 @@
+
+
+:root {
+  --default-font: "Poppins";
+  --heading-font: "Poppins";
+  --nav-font: "Poppins",  sans-serif;
+}
+
+:root { 
+  --background-color: #ffffff; 
+  --default-color: #444444; 
+  --heading-color: #37517e; 
+  --accent-color: #47b2e4; 
+  --surface-color: #ffffff; 
+  --contrast-color: #ffffff; 
+}
+
+:root {
+  --nav-color: #ffffff;  
+  --nav-hover-color: #47b2e4; 
+  --nav-mobile-background-color: #ffffff; 
+  --nav-dropdown-background-color: #ffffff; 
+  --nav-dropdown-color: #444444; 
+  --nav-dropdown-hover-color: #47b2e4;
+}
+
+
+.light-background {
+  --background-color: #f5f6f8;
+  --surface-color: #ffffff;
+}
+
+.dark-background {
+  --background-color: transparent;
+  --default-color: #ffffff;
+  --heading-color: #ffffff;
+  --surface-color: #4668a2;
+  --contrast-color: #ffffff;
+}
+
+/* Smooth scroll */
+:root {
+  scroll-behavior: smooth;
+}
+
+/*--------------------------------------------------------------
+# General Styling & Shared Classes
+--------------------------------------------------------------*/
+body {
+    background-image: url("/assets/img/pic.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: static;
+    background-color: rgba(0, 0, 0, 0);
+    background-attachment: initial;
+    min-height: 100vh;
+    background-position: 50% 50%;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong
+{
+  color: var(--heading-color);
+  font-family: var(--heading-font);
+}
+
+
+/*--------------------------------------------------------------
+# Global Header
+--------------------------------------------------------------*/
+.header {
+  padding: 15px 0;
+}
+
+.header .logo {
+  line-height: 1;
+}
+
+
+.header .logo h1 {
+  font-size: 28px;
+  margin: 0;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--heading-color);
+  letter-spacing: 2px;
+  /* text-transform: uppercase; */
+  font-family: 'Oswald';
+  font-weight: 400; /* Regular */
+  text-align: left;
+  line-height: 24px;
+}
+
+
+
+/* Index Page Header
+------------------------------*/
+.index-page .header {
+  --background-color: rgba(255, 255, 255, 0);
+  --heading-color: #ffffff;
+  --nav-color: #ffffff;
+}
+
+
+/* Mobile Navigation */
+@media (max-width: 1199px) {
+  .mobile-nav-toggle {
+    color: var(--nav-color);
+    font-size: 28px;
+    line-height: 0;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  .navmenu {
+    padding: 0;
+    z-index: 9997;
+  }
+
+  .navmenu ul {
+    display: none;
+    list-style: none;
+    position: absolute;
+    inset: 60px 20px 20px 20px;
+    padding: 10px 0;
+    margin: 0;
+    border-radius: 6px;
+    background-color: var(--nav-mobile-background-color);
+    overflow-y: auto;
+    transition: 0.3s;
+    z-index: 9998;
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .navmenu a,
+  .navmenu a:focus {
+    color: var(--nav-dropdown-color);
+    padding: 10px 20px;
+    font-family: var(--nav-font);
+    font-size: 17px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+    transition: 0.3s;
+  }
+
+  .navmenu a i,
+  .navmenu a:focus i {
+    font-size: 12px;
+    line-height: 0;
+    margin-left: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.3s;
+    background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+  }
+
+  .navmenu a i:hover,
+  .navmenu a:focus i:hover {
+    background-color: var(--accent-color);
+    color: var(--contrast-color);
+  }
+
+  .navmenu a:hover,
+  .navmenu .active,
+  .navmenu .active:focus {
+    color: var(--nav-dropdown-hover-color);
+  }
+
+  .navmenu .active i,
+  .navmenu .active:focus i {
+    background-color: var(--accent-color);
+    color: var(--contrast-color);
+    transform: rotate(180deg);
+  }
+
+  .mobile-nav-active {
+    overflow: hidden;
+  }
+
+  .mobile-nav-active .mobile-nav-toggle {
+    color: #fff;
+    position: absolute;
+    font-size: 32px;
+    top: 15px;
+    right: 15px;
+    margin-right: 0;
+    z-index: 9999;
+  }
+
+  .mobile-nav-active .navmenu {
+    position: fixed;
+    overflow: hidden;
+    inset: 0;
+    background: rgba(33, 37, 41, 0.8);
+    transition: 0.3s;
+  }
+
+  .mobile-nav-active .navmenu>ul {
+    display: block;
+  }
+}
+
+/*--------------------------------------------------------------
+# Hero Section
+--------------------------------------------------------------*/
+.hero {
+  width: 100%;
+  min-height: 80vh;
+  position: relative;
+  padding: 120px 0 60px 0;
+  display: flex;
+  align-items: center;
+}
+
+.strong {
+  margin: 0;
+  font-size: 39px;
+  letter-spacing: 1px;
+  text-align: left;
+  line-height: 48px;
+  font-style: italic;
+  padding-bottom: 22px;
+}
+
+.one {
+  color: rgba(247, 236, 236, 1);
+  margin: 5px 0 30px 0;
+  font-size: 18px;
+  font-family: "Poppins";
+  text-align: left;
+  line-height: 30px;
+  padding-top: 22px;
+  font-style: italic;
+
+}
+
+ .two{
+  margin: 5px 0 30px 0;
+  font-size: 15px;
+  color: rgba(247, 236, 236, 1);
+  font-family: Poppins;
+  text-align: left;
+  line-height: 23px;
+  padding-top: 22px;
+  font-style: italic;
+}
+@media (max-width: 640px) {
+  .strong{
+    font-size: 23px;
+  line-height: 32px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  }
+
+  .one {
+    font-size: 17px;
+    line-height: 24px;
+    margin-bottom: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .two{
+    margin: 5px 0 30px 0;
+    font-size: 17px;
+    text-align: left;
+    line-height: 23px;
+    padding-top: 22px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
+/* Footer Section Styling */
+.footer {
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent; 
+}
+.footer-links {
+  text-align: center;
+}
+
+.footer-link {
+  color: #ffffff;
+  font-family: "Poppins";
+  font-size: 13px;
+  margin: 0 10px;
+  text-decoration: none; 
+  transition: color 0.3s, transform 0.2s;
+}
+
+.footer-link:hover {
+  color: #ffffff; 
+}
+
+.footer-link:active {
+  color: #ffffff; 
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .footer-link {
+    font-size: 10px;
+  }
+}
