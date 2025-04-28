@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <title>My Pension Adviser</title>
+    <title>My Pension Guide</title>
     <link rel="stylesheet" href="styles.css" />
     <link href="/assets/img/favicon.ico" rel="icon" />
     <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
@@ -12,7 +12,7 @@
   <body>
     <section class="navbar">
       <div class="nav">
-        <p>My Pension Adviser</p>
+        <p>My Pension Guide</p>
         <a href="mailto:amyingram@mypensionadviser.org" class="contact-link"
           >Contact</a
         >
@@ -262,6 +262,9 @@
               <textarea id="notes"></textarea>
             </div>
             <div class="input-group">
+              <input type="hidden" id="sender-email" name="senderEmail" />
+            </div>
+            <div class="input-group">
               <button type="submit" onclick="submitForm(event)" class="btn">
                 Submit
               </button>
@@ -275,7 +278,7 @@
       </div>
     </section>
     <div class="footer">
-      <div><p>©2024 Copyright My Pension Adviser All Rights Reserved</p></div>
+      <div><p>©2024 Copyright My Pension Guide All Rights Reserved</p></div>
       <div class="footer-btn">
         <a href="/privacy.html">Privacy Policy</a>
         <a href="/terms.html">Terms</a>
@@ -288,81 +291,81 @@
 
     <script>
       var currentDate = new Date();
-var validOptions = 0; // Counter for valid weekdays
-var i = 0; // Day increment counter
-
-while (validOptions < 10) {
-    var optionDate = new Date(currentDate);
-    optionDate.setDate(currentDate.getDate() + i + 2); // Start 2 days ahead
-
-    // Skip weekends (0 = Sunday, 6 = Saturday)
-    if (optionDate.getDay() === 0 || optionDate.getDay() === 6) {
-        i++;
-        continue;
-    }
-
-    var formattedDate = optionDate.toISOString().split("T")[0];
-    var optionElement = document.createElement("option");
-    optionElement.value = formattedDate;
-    optionElement.textContent = optionDate.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short",
-        weekday: "long",
-    }).replace(",", " -");
-
-    document.getElementById("meeting-date").appendChild(optionElement);
-    validOptions++; // Increment valid option count
-    i++; // Move to the next day
-}
-
+      var validOptions = 0; // Counter for valid weekdays
+      var i = 0; // Day increment counter
+    
+      while (validOptions < 10) {
+        var optionDate = new Date(currentDate);
+        optionDate.setDate(currentDate.getDate() + i + 2); // Start 2 days ahead
+    
+        // Skip weekends (0 = Sunday, 6 = Saturday)
+        if (optionDate.getDay() === 0 || optionDate.getDay() === 6) {
+          i++;
+          continue;
+        }
+    
+        var formattedDate = optionDate.toISOString().split("T")[0];
+        var optionElement = document.createElement("option");
+        optionElement.value = formattedDate;
+        optionElement.textContent = optionDate.toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          weekday: "long",
+        }).replace(",", " -");
+    
+        document.getElementById("meeting-date").appendChild(optionElement);
+        validOptions++; // Increment valid option count
+        i++; // Move to the next day
+      }
+    
       document.addEventListener("DOMContentLoaded", function () {
         const params = new URLSearchParams(window.location.search);
-
+    
         if (params.has("firstName") && params.has("lastName")) {
-          const fullName = `${params.get("firstName")} ${params.get(
-            "lastName"
-          )}`;
+          const fullName = `${params.get("firstName")} ${params.get("lastName")}`;
           document.getElementById("full-name").value = fullName;
         } else if (params.has("firstName")) {
           document.getElementById("full-name").value = params.get("firstName");
         }
-
+    
         if (params.has("Email")) {
           document.getElementById("work-email").value = params.get("Email");
         }
-
+    
         if (params.has("District")) {
-          document.getElementById("employer-district").value =
-            params.get("District");
+          document.getElementById("employer-district").value = params.get("District");
         }
-
+    
         if (params.has("Job Title")) {
           document.getElementById("job-title").value = params.get("Job Title");
         }
-
+    
         if (params.has("state")) {
           document.getElementById("state").value = params.get("state");
         } else {
           document.getElementById("state").value = "texas";
         }
-
+    
         if (params.has("timezone")) {
-          document.getElementById("preferred-time").value =
-            params.get("timezone");
+          document.getElementById("preferred-time").value = params.get("timezone");
         } else {
           document.getElementById("preferred-time").value = "Central";
         }
+    
+        if (params.has("senderEmail")) {
+          document.getElementById("sender-email").value = params.get("senderEmail");
+        }
       });
-
+    
       function formatPhoneNumber(input) {
         // Remove all non-numeric characters
         let value = input.value.replace(/\D/g, "");
-
+    
         // Restrict to 10 digits (US phone number)
         if (value.length > 10) {
           value = value.slice(0, 10);
         }
-
+    
         // Format as (xxx) xxx-xxxx
         let formatted = "";
         if (value.length > 0) {
@@ -374,10 +377,10 @@ while (validOptions < 10) {
         if (value.length >= 7) {
           formatted += "-" + value.slice(6, 10);
         }
-
+    
         input.value = formatted;
       }
-
+    
       function submitForm(event) {
         event.preventDefault();
         var form = document.getElementById("appointment-form");
@@ -385,75 +388,65 @@ while (validOptions < 10) {
           form.reportValidity();
           return;
         }
-
+    
         // Validate phone number format: (xxx) xxx-xxxx
         var mobileNumber = document.getElementById("mobile-number").value;
         var phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
         if (!phoneRegex.test(mobileNumber)) {
-          alert(
-            "Please enter a valid US phone number in the format (xxx) xxx-xxxx."
-          );
+          alert("Please enter a valid US phone number in the format (xxx) xxx-xxxx.");
           return;
         }
-
+    
         var selectedDate = document.getElementById("meeting-date").value;
         var selectedTime = document.getElementById("meeting-time").value;
         var timezone = document.getElementById("preferred-time").value;
-
+    
         // Format the meeting date (e.g., "2025-04-20 - Sunday")
         var dateObj = new Date(selectedDate);
         var formattedDate = `${selectedDate} - ${dateObj.toLocaleDateString(
           "en-US",
           { weekday: "long" }
         )}`;
-
+    
         // Format the meeting time (e.g., "02:30 pm")
         var [hours, minutes] = selectedTime.split(":");
         var hoursNum = parseInt(hours);
         var period = hoursNum >= 12 ? "pm" : "am";
         hoursNum = hoursNum % 12 || 12; // Convert 0 to 12 for midnight, keep 12 for noon
-        var formattedTime = `${hoursNum
-          .toString()
-          .padStart(2, "0")}:${minutes} ${period}`;
-
+        var formattedTime = `${hoursNum.toString().padStart(2, "0")}:${minutes} ${period}`;
+    
+        // Extract Campaign Name and sequenceId from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const campaignName = params.get("Campaign Name") || "";
+        const sequenceId = params.get("sequenceId") || "";
+    
         var formData = {
           full_name: document.getElementById("full-name").value.trim(),
           work_email: document.getElementById("work-email").value.trim(),
-          personal_email: document
-            .getElementById("personal-email")
-            .value.trim(),
+          personal_email: document.getElementById("personal-email").value.trim(),
           mobile_number: document.getElementById("mobile-number").value.trim(),
-          employer_district: document
-            .getElementById("employer-district")
-            .value.trim(),
-          department_school: document
-            .getElementById("department-school")
-            .value.trim(),
+          employer_district: document.getElementById("employer-district").value.trim(),
+          department_school: document.getElementById("department-school").value.trim(),
           job_title: document.getElementById("job-title").value.trim(),
           state: document.getElementById("state").value,
           meeting_date: formattedDate, // Use formatted date
           meeting_time: formattedTime, // Use formatted time
           timezone: timezone,
           notes: document.getElementById("notes").value.trim(),
+          sender_email: document.getElementById("sender-email").value.trim(),
+          campaign_name: campaignName, // Add Campaign Name
+          sequence_id: sequenceId, // Add sequenceId
         };
-
+    
         var xhr = new XMLHttpRequest();
-        xhr.open(
-          "POST",
-          "https://hooks.zapier.com/hooks/catch/17946141/20xgobk/",
-          true
-        );
+        xhr.open("POST", "https://hooks.zapier.com/hooks/catch/17946141/20xgobk/", true);
         xhr.onload = function () {
           if (xhr.status === 200) {
             console.log("Form data sent successfully");
             document.getElementById("banner").style.display = "none";
             document.getElementById("success-message").style.display = "block";
           } else {
-            console.error(
-              "Failed to send form data:",
-              xhr.status,
-              xhr.statusText
-            );
+            console.error("Failed to send form data:", xhr.status, xhr.statusText);
             alert("Failed to submit form. Please try again.");
           }
         };
@@ -463,7 +456,7 @@ while (validOptions < 10) {
         };
         xhr.send(JSON.stringify(formData));
       }
-
+    
       function toggleMenu() {
         document.querySelector(".mobile-menu").classList.toggle("active");
       }
