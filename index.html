@@ -290,197 +290,225 @@
    ></script>
 
 
-   <script>
-     var currentDate = new Date();
-     var validOptions = 0; // Counter for valid weekdays
-     var i = 0; // Day increment counter
-  
-     while (validOptions < 10) {
-       var optionDate = new Date(currentDate);
-       optionDate.setDate(currentDate.getDate() + i + 2); // Start 2 days ahead
-  
-       // Skip weekends (0 = Sunday, 6 = Saturday)
-       if (optionDate.getDay() === 0 || optionDate.getDay() === 6) {
-         i++;
-         continue;
-       }
-  
-       var formattedDate = optionDate.toISOString().split("T")[0];
-       var optionElement = document.createElement("option");
-       optionElement.value = formattedDate;
-       optionElement.textContent = optionDate.toLocaleDateString("en-US", {
-         day: "numeric",
-         month: "short",
-         weekday: "long",
-       }).replace(",", " -");
-  
-       document.getElementById("meeting-date").appendChild(optionElement);
-       validOptions++; // Increment valid option count
-       i++; // Move to the next day
-     }
-  
-     document.addEventListener("DOMContentLoaded", function () {
-       const params = new URLSearchParams(window.location.search);
-  
-       if (params.has("firstName") && params.has("lastName")) {
-         const fullName = `${params.get("firstName")} ${params.get("lastName")}`;
-         document.getElementById("full-name").value = fullName;
-       } else if (params.has("firstName")) {
-         document.getElementById("full-name").value = params.get("firstName");
-       }
-  
-       if (params.has("Email")) {
-         document.getElementById("work-email").value = params.get("Email");
-       }
-  
-       if (params.has("District")) {
-         document.getElementById("employer-district").value = params.get("District");
-       }
-  
-       if (params.has("Job Title")) {
-         document.getElementById("job-title").value = params.get("Job Title");
-       }
-  
-       if (params.has("state")) {
-         document.getElementById("state").value = params.get("state");
-       } else {
-         document.getElementById("state").value = "TX";
-       }
-  
-       if (params.has("timezone")) {
-         document.getElementById("preferred-time").value = params.get("timezone");
-       } else {
-         document.getElementById("preferred-time").value = "Central";
-       }
-  
-       if (params.has("senderEmail")) {
-         document.getElementById("sender-email").value = params.get("senderEmail");
-       }
-     });
-  
-     function formatPhoneNumber(input) {
-       // Remove all non-numeric characters
-       let value = input.value.replace(/\D/g, "");
-  
-       // Restrict to 10 digits (US phone number)
-       if (value.length > 10) {
-         value = value.slice(0, 10);
-       }
-  
-       // Format as (xxx) xxx-xxxx
-       let formatted = "";
-       if (value.length > 0) {
-         formatted = "(" + value.slice(0, 3);
-       }
-       if (value.length >= 4) {
-         formatted += ") " + value.slice(3, 6);
-       }
-       if (value.length >= 7) {
-         formatted += "-" + value.slice(6, 10);
-       }
-  
-       input.value = formatted;
-     }
-  
-     function submitForm(event) {
-   event.preventDefault();
-   var form = document.getElementById("appointment-form");
-   if (!form.checkValidity()) {
-       form.reportValidity();
-       return;
-   }
+    <script>
+      function generateDateOptions() {
+        const dateSelect = document.getElementById("meeting-date");
+        dateSelect.innerHTML = '<option value="">Select a date</option>';
 
+        let currentDate = new Date();
+        let validOptions = 0;
+        let i = 0;
 
-   // Check if reCAPTCHA is completed
-   var recaptchaResponse = grecaptcha.getResponse();
-   if (!recaptchaResponse) {
-       alert("Please complete the reCAPTCHA to submit the form.");
-       return;
-   }
+        while (validOptions < 10) {
+          let optionDate = new Date(currentDate);
+          optionDate.setDate(currentDate.getDate() + i +2); // Start 2 days ahead
 
+          // Skip weekends (0 = Sunday, 6 = Saturday)
+          if (optionDate.getDay() === 0 || optionDate.getDay() === 6) {
+            i++;
+            continue;
+          }
 
-   // Validate phone number format: (xxx) xxx-xxxx
-   var mobileNumber = document.getElementById("mobile-number").value;
-   var phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
-   if (!phoneRegex.test(mobileNumber)) {
-       alert("Please enter a valid US phone number in the format (xxx) xxx-xxxx.");
-       return;
-   }
+          // Format date without timezone conversion
+          const year = optionDate.getFullYear();
+          const month = String(optionDate.getMonth() + 1).padStart(2, "0");
+          const day = String(optionDate.getDate()).padStart(2, "0");
+          const formattedDate = `${year}-${month}-${day}`;
 
+          // Create weekday string
+          const weekday = optionDate.toLocaleDateString("en-US", {
+            weekday: "long",
+          });
+          const displayText = `${formattedDate} - ${weekday}`;
 
-   var selectedDate = document.getElementById("meeting-date").value;
-   var selectedTime = document.getElementById("meeting-time").value;
-   var timezone = document.getElementById("preferred-time").value;
+          const optionElement = document.createElement("option");
+          optionElement.value = formattedDate;
+          optionElement.textContent = displayText;
 
+          dateSelect.appendChild(optionElement);
+          validOptions++;
+          i++;
+        }
+      }
 
-   // Parse the date as local time to avoid UTC shift
-   var [year, month, day] = selectedDate.split("-");
-   var dateObj = new Date(year, month - 1, day); // month - 1 because months are 0-based
-   var formattedDate = `${selectedDate} - ${dateObj.toLocaleDateString(
-       "en-US",
-       { weekday: "long" }
-   )}`;
+      // Initialize date dropdown
+      generateDateOptions();
 
+      document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
 
-   // Format the meeting time (e.g., "02:30 pm")
-   var [hours, minutes] = selectedTime.split(":");
-   var hoursNum = parseInt(hours);
-   var period = hoursNum >= 12 ? "pm" : "am";
-   hoursNum = hoursNum % 12 || 12; // Convert 0 to 12 for midnight, keep 12 for noon
-   var formattedTime = `${hoursNum.toString().padStart(2, "0")}:${minutes} ${period}`;
+        if (params.has("firstName") && params.has("lastName")) {
+          const fullName = `${params.get("firstName")} ${params.get(
+            "lastName"
+          )}`;
+          document.getElementById("full-name").value = fullName;
+        } else if (params.has("firstName")) {
+          document.getElementById("full-name").value = params.get("firstName");
+        }
 
+        if (params.has("Email")) {
+          document.getElementById("work-email").value = params.get("Email");
+        }
 
-   // Extract Campaign Name, sequenceId, and tool from URL parameters
-   const params = new URLSearchParams(window.location.search);
-   const campaignName = params.get("CampaignName") || "";
-   const sequenceId = params.get("sequenceId") || "";
-   const tool = params.get("tool") || "";
+        if (params.has("District")) {
+          document.getElementById("employer-district").value =
+            params.get("District");
+        }
 
+        if (params.has("Job Title")) {
+          document.getElementById("job-title").value = params.get("Job Title");
+        }
 
-   var formData = {
-       full_name: document.getElementById("full-name").value.trim(),
-       work_email: document.getElementById("work-email").value.trim(),
-       personal_email: document.getElementById("personal-email").value.trim(),
-       mobile_number: document.getElementById("mobile-number").value.trim(),
-       employer_district: document.getElementById("employer-district").value.trim(),
-       department_school: document.getElementById("department-school").value.trim(),
-       job_title: document.getElementById("job-title").value.trim(),
-       state: document.getElementById("state").value,
-       meeting_date: formattedDate, // Use corrected formatted date
-       meeting_time: formattedTime, // Use formatted time
-       timezone: timezone,
-       notes: document.getElementById("notes").value.trim(),
-       sender_email: document.getElementById("sender-email").value.trim(),
-       campaign_name: campaignName, // Add Campaign Name
-       sequence_id: sequenceId, // Add sequenceId
-       tool: tool,
-       recaptcha_response: recaptchaResponse
-   };
+        if (params.has("state")) {
+          document.getElementById("state").value = params.get("state");
+        } else {
+          document.getElementById("state").value = "TX";
+        }
 
+        if (params.has("timezone")) {
+          document.getElementById("preferred-time").value =
+            params.get("timezone");
+        } else {
+          document.getElementById("preferred-time").value = "Central";
+        }
 
-   var xhr = new XMLHttpRequest();
-   xhr.open("POST", "https://hooks.zapier.com/hooks/catch/17946141/20xgobk/", true);
-   xhr.onload = function () {
-       if (xhr.status === 200) {
-           document.getElementById("banner").style.display = "none";
-           document.getElementById("success-message").style.display = "block";
-           grecaptcha.reset();
-       } else {
-           console.error("Failed to send form data:", xhr.status, xhr.statusText);
-           alert("Failed to submit form. Please try again.");
-       }
-   };
-   xhr.onerror = function () {
-       console.error("Network error");
-       alert("Network error. Please check your connection and try again.");
-   };
-   xhr.send(JSON.stringify(formData));
-}
-  
-     function toggleMenu() {
-       document.querySelector(".mobile-menu").classList.toggle("active");
-     }
-   </script>
+        if (params.has("senderEmail")) {
+          document.getElementById("sender-email").value =
+            params.get("senderEmail");
+        }
+      });
+
+      function formatPhoneNumber(input) {
+        // Remove all non-numeric characters
+        let value = input.value.replace(/\D/g, "");
+
+        // Restrict to 10 digits (US phone number)
+        if (value.length > 10) {
+          value = value.slice(0, 10);
+        }
+
+        // Format as (xxx) xxx-xxxx
+        let formatted = "";
+        if (value.length > 0) {
+          formatted = "(" + value.slice(0, 3);
+        }
+        if (value.length >= 4) {
+          formatted += ") " + value.slice(3, 6);
+        }
+        if (value.length >= 7) {
+          formatted += "-" + value.slice(6, 10);
+        }
+
+        input.value = formatted;
+      }
+
+      function submitForm(event) {
+        event.preventDefault();
+        var form = document.getElementById("appointment-form");
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        var recaptchaResponse = grecaptcha.getResponse();
+        if (!recaptchaResponse) {
+          alert("Please complete the reCAPTCHA to submit the form.");
+          return;
+        }
+
+        // Validate phone number format: (xxx) xxx-xxxx
+        var mobileNumber = document.getElementById("mobile-number").value;
+        var phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
+        if (!phoneRegex.test(mobileNumber)) {
+          alert(
+            "Please enter a valid US phone number in the format (xxx) xxx-xxxx."
+          );
+          return;
+        }
+
+        var selectedDate = document.getElementById("meeting-date").value;
+        var selectedTime = document.getElementById("meeting-time").value;
+        var timezone = document.getElementById("preferred-time").value;
+
+        // Create date string without reformatting to avoid timezone issues
+        const formattedDate = selectedDate;
+        const weekday = new Date(selectedDate).toLocaleDateString("en-US", {
+          weekday: "long",
+        });
+        const displayDate = `${formattedDate} - ${weekday}`;
+
+        // Format the meeting time (e.g., "02:30 pm")
+        var [hours, minutes] = selectedTime.split(":");
+        var hoursNum = parseInt(hours);
+        var period = hoursNum >= 12 ? "pm" : "am";
+        hoursNum = hoursNum % 12 || 12; // Convert 0 to 12 for midnight, keep 12 for noon
+        var formattedTime = `${hoursNum
+          .toString()
+          .padStart(2, "0")}:${minutes} ${period}`;
+
+        // Extract Campaign Name, sequenceId, and tool from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const campaignName = params.get("CampaignName") || "";
+        const sequenceId = params.get("sequenceId") || "";
+        const tool = params.get("tool") || "";
+
+        var formData = {
+          full_name: document.getElementById("full-name").value.trim(),
+          work_email: document.getElementById("work-email").value.trim(),
+          personal_email: document
+            .getElementById("personal-email")
+            .value.trim(),
+          mobile_number: document.getElementById("mobile-number").value.trim(),
+          employer_district: document
+            .getElementById("employer-district")
+            .value.trim(),
+          department_school: document
+            .getElementById("department-school")
+            .value.trim(),
+          job_title: document.getElementById("job-title").value.trim(),
+          state: document.getElementById("state").value,
+          meeting_date: displayDate,
+          meeting_time: formattedTime,
+          timezone: timezone,
+          notes: document.getElementById("notes").value.trim(),
+          sender_email: document.getElementById("sender-email").value.trim(),
+          campaign_name: campaignName, // Add Campaign Name
+          sequence_id: sequenceId, // Add sequenceId
+          tool: tool,
+          recaptcha_response: recaptchaResponse,
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open(
+          "POST",
+          "https://hooks.zapier.com/hooks/catch/17946141/20xgobk/",
+          true
+        );
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            document.getElementById("banner").style.display = "none";
+            document.getElementById("success-message").style.display = "block";
+            grecaptcha.reset();
+          } else {
+            console.error(
+              "Failed to send form data:",
+              xhr.status,
+              xhr.statusText
+            );
+            alert("Failed to submit form. Please try again.");
+          }
+        };
+        xhr.onerror = function () {
+          console.error("Network error");
+          alert("Network error. Please check your connection and try again.");
+        };
+        xhr.send(JSON.stringify(formData));
+      }
+
+      function toggleMenu() {
+        document.querySelector(".mobile-menu").classList.toggle("active");
+      }
+    </script>
  </body>
 </html>
 
