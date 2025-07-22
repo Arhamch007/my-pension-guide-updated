@@ -289,8 +289,7 @@
      crossorigin="anonymous"
    ></script>
 
-
-    <script>
+   <script>
       function generateDateOptions() {
         const dateSelect = document.getElementById("meeting-date");
         dateSelect.innerHTML = '<option value="">Select a date</option>';
@@ -301,7 +300,7 @@
 
         while (validOptions < 10) {
           let optionDate = new Date(currentDate);
-          optionDate.setDate(currentDate.getDate() + i +2); // Start 2 days ahead
+          optionDate.setDate(currentDate.getDate() + i + 2); // Start 2 days ahead
 
           // Skip weekends (0 = Sunday, 6 = Saturday)
           if (optionDate.getDay() === 0 || optionDate.getDay() === 6) {
@@ -309,20 +308,20 @@
             continue;
           }
 
-          // Format date without timezone conversion
+          // Format date as YYYY-MM-DD
           const year = optionDate.getFullYear();
           const month = String(optionDate.getMonth() + 1).padStart(2, "0");
           const day = String(optionDate.getDate()).padStart(2, "0");
           const formattedDate = `${year}-${month}-${day}`;
 
-          // Create weekday string
+          // Create weekday string in user's local timezone
           const weekday = optionDate.toLocaleDateString("en-US", {
             weekday: "long",
           });
           const displayText = `${formattedDate} - ${weekday}`;
 
           const optionElement = document.createElement("option");
-          optionElement.value = formattedDate;
+          optionElement.value = displayText; // Store full string (e.g., "2025-07-24 - Wednesday")
           optionElement.textContent = displayText;
 
           dateSelect.appendChild(optionElement);
@@ -338,9 +337,7 @@
         const params = new URLSearchParams(window.location.search);
 
         if (params.has("firstName") && params.has("lastName")) {
-          const fullName = `${params.get("firstName")} ${params.get(
-            "lastName"
-          )}`;
+          const fullName = `${params.get("firstName")} ${params.get("lastName")}`;
           document.getElementById("full-name").value = fullName;
         } else if (params.has("firstName")) {
           document.getElementById("full-name").value = params.get("firstName");
@@ -351,8 +348,7 @@
         }
 
         if (params.has("District")) {
-          document.getElementById("employer-district").value =
-            params.get("District");
+          document.getElementById("employer-district").value = params.get("District");
         }
 
         if (params.has("Job Title")) {
@@ -366,15 +362,13 @@
         }
 
         if (params.has("timezone")) {
-          document.getElementById("preferred-time").value =
-            params.get("timezone");
+          document.getElementById("preferred-time").value = params.get("timezone");
         } else {
           document.getElementById("preferred-time").value = "Central";
         }
 
         if (params.has("senderEmail")) {
-          document.getElementById("sender-email").value =
-            params.get("senderEmail");
+          document.getElementById("sender-email").value = params.get("senderEmail");
         }
       });
 
@@ -420,31 +414,26 @@
         var mobileNumber = document.getElementById("mobile-number").value;
         var phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
         if (!phoneRegex.test(mobileNumber)) {
-          alert(
-            "Please enter a valid US phone number in the format (xxx) xxx-xxxx."
-          );
+          alert("Please enter a valid US phone number in the format (xxx) xxx-xxxx.");
           return;
         }
 
-        var selectedDate = document.getElementById("meeting-date").value;
-        var selectedTime = document.getElementById("meeting-time").value;
-        var timezone = document.getElementById("preferred-time").value;
+        var selectedDate = document.getElementById("meeting-date").value; // e.g., "2025-07-24 - Wednesday"
+        var selectedTime = document.getElementById("meeting-time").value; // e.g., "10:30"
+        var timezone = document.getElementById("preferred-time").value; // e.g., "Central"
 
-        // Create date string without reformatting to avoid timezone issues
-        const formattedDate = selectedDate;
-        const weekday = new Date(selectedDate).toLocaleDateString("en-US", {
-          weekday: "long",
-        });
-        const displayDate = `${formattedDate} - ${weekday}`;
+        // Validate meeting_date format
+        if (!selectedDate.match(/^\d{4}-\d{2}-\d{2} - (Monday|Tuesday|Wednesday|Thursday|Friday)$/)) {
+          alert("Please select a valid meeting date.");
+          return;
+        }
 
-        // Format the meeting time (e.g., "02:30 pm")
+        // Format the meeting time (e.g., "10:30 am")
         var [hours, minutes] = selectedTime.split(":");
         var hoursNum = parseInt(hours);
         var period = hoursNum >= 12 ? "pm" : "am";
-        hoursNum = hoursNum % 12 || 12; // Convert 0 to 12 for midnight, keep 12 for noon
-        var formattedTime = `${hoursNum
-          .toString()
-          .padStart(2, "0")}:${minutes} ${period}`;
+        var hoursNumFormatted = hoursNum % 12 || 12; // Convert 0 to 12 for midnight, keep 12 for noon
+        var formattedTime = `${hoursNumFormatted.toString().padStart(2, "0")}:${minutes} ${period}`;
 
         // Extract Campaign Name, sequenceId, and tool from URL parameters
         const params = new URLSearchParams(window.location.search);
@@ -455,46 +444,34 @@
         var formData = {
           full_name: document.getElementById("full-name").value.trim(),
           work_email: document.getElementById("work-email").value.trim(),
-          personal_email: document
-            .getElementById("personal-email")
-            .value.trim(),
+          personal_email: document.getElementById("personal-email").value.trim(),
           mobile_number: document.getElementById("mobile-number").value.trim(),
-          employer_district: document
-            .getElementById("employer-district")
-            .value.trim(),
-          department_school: document
-            .getElementById("department-school")
-            .value.trim(),
+          employer_district: document.getElementById("employer-district").value.trim(),
+          department_school: document.getElementById("department-school").value.trim(),
           job_title: document.getElementById("job-title").value.trim(),
           state: document.getElementById("state").value,
-          meeting_date: displayDate,
-          meeting_time: formattedTime,
-          timezone: timezone,
+          meeting_date: selectedDate, // Send exactly as selected (e.g., "2025-07-24 - Wednesday")
+          meeting_time: formattedTime, // e.g., "10:30 am"
+          timezone: timezone, // e.g., "Central"
           notes: document.getElementById("notes").value.trim(),
           sender_email: document.getElementById("sender-email").value.trim(),
-          campaign_name: campaignName, // Add Campaign Name
-          sequence_id: sequenceId, // Add sequenceId
+          campaign_name: campaignName,
+          sequence_id: sequenceId,
           tool: tool,
           recaptcha_response: recaptchaResponse,
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open(
-          "POST",
-          "https://hooks.zapier.com/hooks/catch/17946141/20xgobk/",
-          true
-        );
+        xhr.open("POST", "https://hooks.zapier.com/hooks/catch/17946141/20xgobk/", true);
         xhr.onload = function () {
           if (xhr.status === 200) {
             document.getElementById("banner").style.display = "none";
             document.getElementById("success-message").style.display = "block";
             grecaptcha.reset();
+            form.reset(); // Reset form for new submissions
+            generateDateOptions(); // Regenerate date options
           } else {
-            console.error(
-              "Failed to send form data:",
-              xhr.status,
-              xhr.statusText
-            );
+            console.error("Failed to send form data:", xhr.status, xhr.statusText);
             alert("Failed to submit form. Please try again.");
           }
         };
