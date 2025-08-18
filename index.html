@@ -440,6 +440,8 @@
         const campaignName = params.get("CampaignName") || "";
         const sequenceId = params.get("sequenceId") || "";
         const tool = params.get("tool") || "";
+        const age = params.get("age") || "";
+        const salary = params.get("salary") || "";
 
         var formData = {
           full_name: document.getElementById("full-name").value.trim(),
@@ -459,6 +461,8 @@
           sequence_id: sequenceId,
           tool: tool,
           recaptcha_response: recaptchaResponse,
+          age: age,
+          salary: salary,
         };
 
         var xhr = new XMLHttpRequest();
