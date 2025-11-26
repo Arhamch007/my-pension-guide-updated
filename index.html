@@ -139,7 +139,7 @@
              >
              <select id="state" required>
                <option value="">Select a state</option>
-               <option value="alabama">Alabama</option>
+               <!-- <option value="alabama">Alabama</option>
                <option value="alaska">Alaska</option>
                <option value="arizona">Arizona</option>
                <option value="arkansas">Arkansas</option>
@@ -188,7 +188,7 @@
                <option value="washington">Washington</option>
                <option value="west-virginia">West Virginia</option>
                <option value="wisconsin">Wisconsin</option>
-               <option value="wyoming">Wyoming</option>
+               <option value="wyoming">Wyoming</option> -->
              </select>
            </div>
            <div class="input-group-mid">
@@ -216,7 +216,7 @@
                  <option value="">Select a time</option>
                  <!-- <option value="08:00">8:00 AM</option>
                  <option value="08:30">8:30 AM</option> -->
-                 <option value="09:00">9:00 AM</option>
+                 <!-- <option value="09:00">9:00 AM</option>
                  <option value="09:30">9:30 AM</option>
                  <option value="10:00">10:00 AM</option>
                  <option value="10:30">10:30 AM</option>
@@ -232,7 +232,7 @@
                  <option value="15:30">3:30 PM</option>
                  <option value="16:00">4:00 PM</option>
                  <option value="16:30">4:30 PM</option>
-                 <option value="17:00">5:00 PM</option>
+                 <option value="17:00">5:00 PM</option> -->
                  <!-- <option value="17:30">5:30 PM</option>
                  <option value="18:00">6:00 PM</option> -->
                </select>
@@ -245,13 +245,13 @@
              >
              <select id="preferred-time" required>
                <option value="">Select a timezone</option>
-               <option value="Eastern">Eastern</option>
+               <!-- <option value="Eastern">Eastern</option>
                <option value="Central">Central</option>
                <option value="Mountain">Mountain</option>
                <option value="Mountain - Phoenix">Mountain - Phoenix</option>
                <option value="Pacific">Pacific</option>
                <option value="Alaskan">Alaskan</option>
-               <option value="Hawaiian">Hawaiian</option>
+               <option value="Hawaiian">Hawaiian</option> -->
              </select>
            </div>
            <div class="input-group">
@@ -490,6 +490,135 @@
         document.querySelector(".mobile-menu").classList.toggle("active");
       }
     </script>
+
+
+ <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC9lw-Sssmr2vk-V0o1ESVPURppw12VY5w",
+  authDomain: "landing-pages-setup.firebaseapp.com",
+  projectId: "landing-pages-setup",
+  storageBucket: "landing-pages-setup.firebasestorage.app",
+  messagingSenderId: "182996055647",
+  appId: "1:182996055647:web:ec69ee499cf273f9730dea",
+  measurementId: "G-ZGR03VBTZP",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function loadFormOptions() {
+  let domain = "pensionassistanthelp.org";
+  if (domain === "localhost" || domain === "127.0.0.1") {
+    domain = "pensionassistanthelp.org";
+  }
+
+  // Meeting Times
+  const meetingTimesSnap = await getDocs(
+    query(
+      collection(db, "formOptions", domain, "meetingTimes"),
+      orderBy("order", "asc")
+    )
+  );
+  const meetingSelect = document.getElementById("meeting-time");
+  meetingSelect.innerHTML = `<option value="">Select a time</option>`;
+  meetingTimesSnap.forEach((docSnap) => {
+    const data = docSnap.data();
+    const o = document.createElement("option");
+    o.value = data.value;
+    o.textContent = data.label;
+    meetingSelect.appendChild(o);
+  });
+
+  // States
+  const statesSnap = await getDocs(
+    query(
+      collection(db, "formOptions", domain, "states"),
+      orderBy("order", "asc")
+    )
+  );
+  const stateSelect = document.getElementById("state");
+  stateSelect.innerHTML = `<option value="">Select a state</option>`;
+  statesSnap.forEach((docSnap) => {
+    const data = docSnap.data();
+    const o = document.createElement("option");
+    o.value = data.value;
+    o.textContent = data.label;
+    stateSelect.appendChild(o);
+  });
+
+  // Timezones
+  const timezonesSnap = await getDocs(
+    query(
+      collection(db, "formOptions", domain, "timeZone"),
+      orderBy("order", "asc")
+    )
+  );
+  const tzSelect = document.getElementById("preferred-time");
+  tzSelect.innerHTML = `<option value="">Select a timezone</option>`;
+  timezonesSnap.forEach((docSnap) => {
+    const data = docSnap.data();
+    const o = document.createElement("option");
+    o.value = data.value;
+    o.textContent = data.label;
+    tzSelect.appendChild(o);
+  });
+}
+
+async function prefillFieldsFromURL() {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.has("firstName") && params.has("lastName")) {
+    const fullName = `${params.get("firstName")} ${params.get("lastName")}`;
+    document.getElementById("full-name").value = fullName;
+  } else if (params.has("firstName")) {
+    document.getElementById("full-name").value = params.get("firstName");
+  }
+
+  if (params.has("Email")) {
+    document.getElementById("work-email").value = params.get("Email");
+  }
+
+  if (params.has("District")) {
+    document.getElementById("employer-district").value =
+      params.get("District");
+  }
+
+  if (params.has("Job Title")) {
+    document.getElementById("job-title").value = params.get("Job Title");
+  }
+
+  if (params.has("state")) {
+    document.getElementById("state").value = params.get("state");
+  } else {
+    document.getElementById("state").value = "TX";
+  }
+
+  if (params.has("timezone")) {
+    document.getElementById("preferred-time").value = params.get("timezone");
+  } else {
+    document.getElementById("preferred-time").value = "Central";
+  }
+
+  if (params.has("senderEmail")) {
+    document.getElementById("sender-email").value =
+      params.get("senderEmail");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadFormOptions(); 
+  prefillFieldsFromURL();  
+});
+</script>
  </body>
 </html>
 
